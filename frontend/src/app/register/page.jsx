@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/components/AuthContext';
-import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const { auth, setAuth } = useContext(AuthContext);
@@ -12,7 +12,6 @@ export default function RegisterPage() {
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -35,29 +34,22 @@ export default function RegisterPage() {
       return;
     }
 
-    const parsedAge = parseInt(age);
-    if (isNaN(parsedAge) || parsedAge < 1 || parsedAge > 120) {
-      setErrorMsg('Age must be a number between 1 and 120.');
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      setErrorMsg(error.message);
       return;
     }
 
-    try {
-      await axios.post(
-        'http://localhost:8000/auth/register',
-        {
-          email,
-          password,
-          name: username,
-          age: parsedAge,
-        },
-        { withCredentials: true }
-      );
-
-      router.push('/login');
-    } catch (err) {
-      const msg = err.response?.data?.msg || 'Registration failed.';
-      setErrorMsg(msg);
+    // Insert name into profiles table
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .insert({ id: data.user.id, name: username });
+    if (profileError) {
+      setErrorMsg(profileError.message);
+      return;
     }
+
+    router.push('/login');
   };
 
   return (
@@ -90,21 +82,6 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
-                required
-              />
-            </label>
-          </fieldset>
-
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Age</legend>
-            <label className="input">
-              <input
-                type="number"
-                min="1"
-                max="120"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                placeholder="Age"
                 required
               />
             </label>

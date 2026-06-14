@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 
 export const AuthContext = createContext();
 
@@ -13,28 +13,39 @@ export const AuthProvider = ({ children }) => {
   });
 
   const checkAuthStatus = async () => {
-    try {
-      const res = await axios.get('http://localhost:8000/auth/status', {
-        withCredentials: true,
-      });
+    const { data: { session } } = await supabase.auth.getSession();
 
-      setAuth({
-        isAuthenticated: true,
-        user: res.data.user,
-        loading: false,
-      });
-    } catch (err) {
-      console.error('Auth check failed:', err.response?.data || err.message);
-      setAuth({
-        isAuthenticated: false,
-        user: null,
-        loading: false,
-      });
+    if (!session) {
+      setAuth({ isAuthenticated: false, user: null, loading: false });
+      return;
     }
+
+    // Fetch name from profiles table
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', session.user.id)
+      .single();
+
+    setAuth({
+      isAuthenticated: true,
+      user: {
+        id: session.user.id,
+        email: session.user.email,
+        name: profile?.name,
+      },
+      loading: false,
+    });
   };
 
   useEffect(() => {
     checkAuthStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      checkAuthStatus();
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   return (

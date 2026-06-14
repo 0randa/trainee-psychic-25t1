@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import { uploadGameScore } from "../helpers";
 
 import headImg from "../../../public/images/snake/snake-head.png";
