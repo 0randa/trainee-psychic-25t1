@@ -2,7 +2,7 @@
 
 import { useContext } from 'react';
 import { AuthContext } from '@/components/AuthContext';
-import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
@@ -10,21 +10,19 @@ export default function Navbar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    try {
-      await axios.post('http://localhost:8000/auth/logout', {}, {
-        withCredentials: true,
-      });
-
-      setAuth({
-        isAuthenticated: false,
-        user: null,
-        loading: false,
-      });
-
-      router.push('/login');
-    } catch (err) {
-      console.error('Logout failed:', err.response?.data || err.message);
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout failed:', error.message);
+      return;
     }
+
+    setAuth({
+      isAuthenticated: false,
+      user: null,
+      loading: false,
+    });
+
+    router.push('/login');
   };
 
   return (

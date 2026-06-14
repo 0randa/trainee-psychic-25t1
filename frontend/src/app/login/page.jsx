@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/components/AuthContext';
-import axios from 'axios';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -28,19 +28,14 @@ export default function LoginPage() {
     e.preventDefault();
     setErrorMsg('');
 
-    try {
-      const res = await axios.post(
-        'http://localhost:8000/auth/login',
-        { email, password },
-        { withCredentials: true }
-      );
-
-      await checkAuthStatus();
-      router.push('/');
-    } catch (err) {
-      const msg = err.response?.data?.msg || 'Login failed.';
-      setErrorMsg(msg);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setErrorMsg(error.message);
+      return;
     }
+
+    await checkAuthStatus();
+    router.push('/');
   };
 
   return (

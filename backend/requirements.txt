@@ -1,6 +1,7 @@
 Flask
 flask-cors
 flask-bcrypt
-flask-jwt-extended
 python-dotenv
-mysql-connector-python
+psycopg2-binary
+python-jose[cryptography]
+requests

@@ -6,7 +6,6 @@ import L from "leaflet";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import iconUrlfromLeaflet from "leaflet/dist/images/marker-icon.png";
 import shadowUrlfromLeaflet from "leaflet/dist/images/marker-shadow.png";
-import axios from "axios";
 import { uploadGameScore } from "../helpers";
 
 import {

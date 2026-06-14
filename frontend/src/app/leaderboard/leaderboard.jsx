@@ -1,4 +1,5 @@
-import axios from "axios";
+"use client";
+import { apiRequest } from "@/lib/api";
 import { useState } from "react";
 
 export default function LeaderBoard() {
@@ -22,9 +23,7 @@ export default function LeaderBoard() {
 
   async function getScores() {
     try {
-      const response = await axios.get("http://localhost:8000/scores/get", {
-        withCredentials: true,
-      });
+      const response = await apiRequest("get", "/scores/get");
       setScores(response.data.scores);
     } catch (error) {
       console.error("Failed to upload score: ", error);

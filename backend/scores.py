@@ -1,10 +1,11 @@
 import logging
 
 from flask import Blueprint, jsonify, request
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
-import mysql.connector
+import psycopg2
+import psycopg2.extras
+import requests
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 import os
 
@@ -12,29 +13,35 @@ load_dotenv()
 
 logging.basicConfig(level=logging.INFO,filename='log.log', filemode='w')
 
-CONFIG = {
-    'user': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'host': os.getenv('DB_HOST'),
-    'port': int(os.getenv('DB_PORT')),
-    'database': os.getenv('DB_NAME')
-}
-
 score_bp = Blueprint('score', __name__)
-bcrypt = Bcrypt()
+
 
 # Black magic which connects to database
 def get_db_connection():
-    return mysql.connector.connect(**CONFIG)
+    return psycopg2.connect(os.getenv('DATABASE_URL'))
+
+
+def get_current_user_id():
+    """Verify Supabase JWT and return the user's uuid, or None if invalid."""
+    auth_header = request.headers.get('Authorization', '')
+    if not auth_header.startswith('Bearer '):
+        return None
+    token = auth_header.split(' ')[1]
+    try:
+        supabase_url = os.getenv('SUPABASE_URL')
+        jwks = requests.get(f"{supabase_url}/auth/v1/.well-known/jwks.json").json()
+        payload = jwt.decode(token, jwks, algorithms=['RS256'], audience='authenticated')
+        return payload['sub']  # user's uuid
+    except JWTError:
+        return None
 
 
 @score_bp.route('/scores/upload', methods=['POST'])
-@jwt_required()
 def upload_score():
     """
     Upload the game score
     ---
-    Uploads the score for the given game_id, using the JWT
+    Uploads the score for the given game_id, using the Supabase JWT
 
     Request body (JSON):
     -   score (int): The score of the game
@@ -47,7 +54,10 @@ def upload_score():
     - 404 Not Found: No game_id found with the given game_id
     - 500 Internal Server Error: Database or server error
     """
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
     data = request.get_json()
 
     if not data or 'game_id' not in data or 'score' not in data:
@@ -59,16 +69,16 @@ def upload_score():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         # Check if the game exists
-        cursor.execute("select id from Games where id = %s", (game_id,))
+        cursor.execute('select id from "Games" where id = %s', (game_id,))
         game = cursor.fetchone()
         if not game:
             return jsonify({"msg": "Game not found."}), 404
 
         # Insert score into Scores table
         cursor.execute(
-            "insert into Scores (user_id, game_id, score) values (%s, %s, %s)",
+            'insert into "Scores" (user_id, game_id, score) values (%s, %s, %s)',
             (current_user_id, game_id, score)
         )
         conn.commit()
@@ -82,20 +92,22 @@ def upload_score():
         conn.close()
 
 @score_bp.route('/scores/game', methods=['GET'])
-@jwt_required()
 def get_scores_by_game():
-    # current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
+
     data = request.get_json()
-    
+
     game_id = data['game_id']
 
     # pull the scores from the database
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # check if game exists
-        get_game_query = "select * from Games where id = %s"
+        get_game_query = 'select * from "Games" where id = %s'
         cursor.execute(get_game_query, (game_id, ))
 
         game = cursor.fetchone()
@@ -103,13 +115,13 @@ def get_scores_by_game():
             return jsonify({"msg": "Game not found."}), 404
 
         # get all the scores.
-        get_scores_query = """select * from Scores where game_id = %s"""
+        get_scores_query = 'select * from "Scores" where game_id = %s'
         cursor.execute(get_scores_query, (game_id,))
 
         scores = cursor.fetchall()
 
         conn.commit()
-        return jsonify({scores})
+        return jsonify({"scores": scores})
 
     except Exception as e:
         print(f"Error {e}")
@@ -119,20 +131,21 @@ def get_scores_by_game():
         conn.close()
 
 @score_bp.route('/scores/user', methods=['GET'])
-@jwt_required()
 def get_scores_by_user():
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
         # fetch all of the scores related to the user
-        query = """select SUM(score) from Scores where user_id = %s"""
+        query = 'select SUM(score) from "Scores" where user_id = %s'
         cursor.execute(query, (current_user_id, ))
         scores = cursor.fetchone()[0] or 0
         conn.commit()
-        return jsonify({scores})
+        return jsonify({"scores": scores})
 
     except Exception as e:
         print(f"Error {e}")
@@ -143,39 +156,40 @@ def get_scores_by_user():
 
 
 @score_bp.route('/scores/user/most_played', methods=['GET'])
-@jwt_required()
 def get_most_played_game_by_user():
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
 
     conn = None
     cursor = None
     try:
-        conn = get_db_connection() 
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         query = """
         select
             s.game_id,
-            sum(s.score) AS total_score_for_most_played_game 
-        from Scores AS s
-        join Games AS G on s.game_id = G.id
-        where s.user_id = %s  
+            sum(s.score) AS total_score_for_most_played_game
+        from "Scores" AS s
+        join "Games" AS G on s.game_id = G.id
+        where s.user_id = %s
         group by s.game_id, G.name
         having count(s.game_id) = (
-            select max(play_count) 
+            select max(play_count)
             from (
                 select game_id, COUNT(*) AS play_count
-                from Scores
-                where user_id = %s 
+                from "Scores"
+                where user_id = %s
                 group by game_id
-            ) as UserMaxPlayCounts 
+            ) as UserMaxPlayCounts
         )
         order by count(s.game_id) desc
-        limit 1; 
+        limit 1;
         """
 
         cursor.execute(query, (current_user_id, current_user_id))
-        most_played_game = cursor.fetchone() 
+        most_played_game = cursor.fetchone()
 
         if most_played_game:
             response_data = {"game_id": most_played_game[0], "score": most_played_game[1]}
@@ -195,16 +209,17 @@ def get_most_played_game_by_user():
 
 
 @score_bp.route('/scores/get', methods=['GET'])
-@jwt_required()
 def get_scores():
-    current_user_id = get_jwt_identity()
+    current_user_id = get_current_user_id()
+    if not current_user_id:
+        return jsonify({"msg": "Unauthorized"}), 401
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
-        query = """select s.user_id, u.name, sum(score) from Scores s
-        join Users u on
+        query = """select s.user_id, u.name, sum(score) from "Scores" s
+        join profiles u on
         u.id = s.user_id
         group by s.user_id, u.name"""
 
@@ -217,7 +232,7 @@ def get_scores():
         return jsonify({"scores": scores_list})
     except Exception as e:
         print(f"Error {e}")
-        return jsonify({"msg": e}), 500
+        return jsonify({"msg": str(e)}), 500
     finally:
         cur.close()
         conn.close()

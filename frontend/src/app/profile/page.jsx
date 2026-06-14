@@ -1,5 +1,6 @@
 "use client";
-import axios from "axios";
+import { apiRequest } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import React, { useEffect } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -25,10 +26,22 @@ export default function ProfilePage() {
   useEffect(() => {
     async function getUserDetails() {
       try {
-        const response = await axios.get("http://localhost:8000/auth/status", {
-          withCredentials: true,
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) return;
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("name")
+          .eq("id", session.user.id)
+          .single();
+
+        setUserDetails({
+          id: session.user.id,
+          email: session.user.email,
+          name: profile?.name,
         });
-        setUserDetails(response.data.user);
       } catch (error) {
         console.error("Failed to get status: ", error);
       }
@@ -40,11 +53,9 @@ export default function ProfilePage() {
   useEffect(() => {
     async function frequentlyPLayed() {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/scores/user/most_played",
-          {
-            withCredentials: true,
-          }
+        const response = await apiRequest(
+          "get",
+          "/scores/user/most_played"
         );
         const { game_id, score } = response.data;
         setgameID(game_id);
@@ -119,7 +130,6 @@ export default function ProfilePage() {
                 <div className="flex flex-col flex-[1] pr-2">
                   <div className="font-medium">Most played game:</div>
                   <div className="font-medium">Score:</div>
-                  <div className="font-medium">Age:</div>
                 </div>
                 <div className="flex flex-col flex-[1.5] pl-2">
                   <div>
@@ -131,7 +141,6 @@ export default function ProfilePage() {
                     </a>
                   </div>
                   <div>{gameScore || "Loading... "}</div>
-                  <div>{userDetails?.age || "Loading..."}</div>
                 </div>
               </div>
             </div>
