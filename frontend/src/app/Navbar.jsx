@@ -4,6 +4,7 @@ import { useContext } from 'react';
 import { AuthContext } from '@/components/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function Navbar() {
   const { auth, setAuth } = useContext(AuthContext);
@@ -47,8 +48,9 @@ export default function Navbar() {
         <a className="btn btn-ghost text-xl">tentative name 🤺</a>
       </div>
 
-      <div className="navbar-end hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
+      <div className="navbar-end gap-2">
+        <ThemeToggle />
+        <ul className="menu menu-horizontal px-1 hidden lg:flex">
           <li><a onClick={() => router.push('/')}>HOME</a></li>
           <li><a onClick={() => document.getElementById('leaderboardModal').showModal()}>LEADERBOARD</a></li>
           {auth.isAuthenticated ? (
