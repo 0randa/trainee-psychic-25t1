@@ -41,7 +41,8 @@ create table "Scores" (
 **3. Grab these values from Supabase → Project Settings → API:**
 - Project URL (`NEXT_PUBLIC_SUPABASE_URL`)
 - Anon public key (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
-- JWT Secret (`SUPABASE_JWT_SECRET`)
+
+> Note: Do NOT use the legacy JWT secret for token verification — Supabase has migrated to asymmetric signing keys. The backend verifies tokens via the JWKS endpoint instead.
 
 **4. Grab the database connection string from Supabase → Project Settings → Database:**
 - Connection string (`DATABASE_URL`) — use the "URI" format
@@ -54,7 +55,7 @@ Create `backend/.env`:
 
 ```
 DATABASE_URL=postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres
-SUPABASE_JWT_SECRET=your-jwt-secret
+SUPABASE_URL=https://[ref].supabase.co
 FRONTEND_URL=http://localhost:3000
 ```
 
@@ -77,7 +78,7 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ### Backend
 - `auth.py` is deleted — Supabase handles all auth
 - `scores.py` switches from MySQL to Postgres, and verifies Supabase JWTs instead of issuing its own
-- `requirements.txt` swaps `mysql-connector-python` + `flask-jwt-extended` for `psycopg2-binary` + `PyJWT`
+- `requirements.txt` swaps `mysql-connector-python` + `flask-jwt-extended` for `psycopg2-binary`, `python-jose[cryptography]`, and `requests`
 - `app.py` becomes a minimal Flask app (no more JWT config)
 
 ### Frontend

@@ -1,22 +1,18 @@
 WARNING:werkzeug: * Debugger is active!
-INFO:werkzeug: * Debugger PIN: 382-879-022
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:31] "GET /auth/status HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:36] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:41] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:45] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:49] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:53] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:09:57] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:01] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:05] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:09] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:14] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:19] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:20] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:20] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:23] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:23] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:25] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:27] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:29] "GET /scores/get HTTP/1.1" 200 -
-INFO:werkzeug:172.18.0.1 - - [26/May/2025 05:10:32] "GET /scores/get HTTP/1.1" 200 -
+INFO:werkzeug: * Debugger PIN: 142-991-723
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:19] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:20] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:22] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:22] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:22] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:22] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:25] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:25] "OPTIONS /scores/get HTTP/1.1" 200 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:25] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
+INFO:werkzeug:192.168.65.1 - - [15/Jun/2026 07:57:25] "[31m[1mGET /scores/get HTTP/1.1[0m" 401 -
