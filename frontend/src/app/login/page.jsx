@@ -39,8 +39,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex justify-center items-center w-full min-h-screen bg-blue-100">
-      <div className="flex-col bg-white p-5 gap-3 rounded-lg">
+    <div className="flex justify-center items-center w-full min-h-screen bg-base-200">
+      <div className="flex-col bg-base-100 text-base-content p-5 gap-3 rounded-lg shadow-lg">
         <h1 className="text-center text-3xl font-bold mb-7">Login</h1>
         <form onSubmit={handleLogin}>
           {errorMsg && (
