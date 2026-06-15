@@ -54,8 +54,11 @@ export function ThemeProvider({ children }) {
   }, []);
 
   const toggleTheme = useCallback(() => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  }, [theme, setTheme]);
+    // Read the live source of truth (set by setTheme/the init script) so this
+    // callback stays stable instead of depending on the `theme` state value.
+    const current = document.documentElement.dataset.theme;
+    setTheme(current === 'dark' ? 'light' : 'dark');
+  }, [setTheme]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>

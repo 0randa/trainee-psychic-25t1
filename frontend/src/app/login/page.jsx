@@ -44,12 +44,12 @@ export default function LoginPage() {
         <h1 className="text-center text-3xl font-bold mb-7">Login</h1>
         <form onSubmit={handleLogin}>
           {errorMsg && (
-            <div className="text-red-600 font-medium my-2">{errorMsg}</div>
+            <div className="text-error font-medium my-2">{errorMsg}</div>
           )}
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Email</legend>
-            <label className="input">
+            <label className="input input-bordered flex items-center gap-2 w-80">
               <input
                 type="text"
                 value={email}
@@ -81,7 +81,7 @@ export default function LoginPage() {
             Don&apos;t have an account?{' '}
             <Link
               href="/register"
-              className="text-blue-600 underline hover:text-blue-800"
+              className="link link-primary"
             >
               Signup now
             </Link>

@@ -58,12 +58,12 @@ export default function RegisterPage() {
         <h1 className="text-center text-3xl font-bold mb-7">Register</h1>
         <form onSubmit={handleRegister}>
           {errorMsg && (
-            <div className="text-red-600 font-medium my-2">{errorMsg}</div>
+            <div className="text-error font-medium my-2">{errorMsg}</div>
           )}
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Username</legend>
-            <label className="input">
+            <label className="input input-bordered flex items-center gap-2 w-80">
               <input
                 type="text"
                 value={username}
@@ -76,7 +76,7 @@ export default function RegisterPage() {
 
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Email</legend>
-            <label className="input">
+            <label className="input input-bordered flex items-center gap-2 w-80">
               <input
                 type="email"
                 value={email}
@@ -121,7 +121,7 @@ export default function RegisterPage() {
             Have an account already?{' '}
             <Link
               href="/login"
-              className="text-blue-600 underline hover:text-blue-800"
+              className="link link-primary"
             >
               Login here
             </Link>
