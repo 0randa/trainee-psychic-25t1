@@ -2,7 +2,9 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark;
+}
 
 @theme inline {
   --color-background: var(--background);
